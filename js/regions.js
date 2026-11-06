@@ -266,6 +266,7 @@ regionSelect.addEventListener("change", async () => {
       rows.push({
         authorityName: authority.authorityName,
         stats: summariseParks(parks),
+        parks,
       });
     }
 

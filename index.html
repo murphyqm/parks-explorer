@@ -4,6 +4,7 @@
   <meta name="robots" content="noindex">
   <!-- Cookie Consent by TermsFeed https://www.TermsFeed.com -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script> 
+  <script src="https://cdn.jsdelivr.net/npm/@sgratzl/chartjs-chart-boxplot@4.4.5/build/index.umd.min.js" defer></script>
   <script src="js/charts.js" defer></script>
   <script src="js/regions.js" defer></script>
 <script type="text/javascript" src="https://www.termsfeed.com/public/cookie-consent/4.2.0/cookie-consent.js" charset="UTF-8"></script>
@@ -110,6 +111,38 @@ cookieconsent.run({"notice_banner_type":"standalone","consent_type":"express","p
         </div>
     </section>
 
+    <button
+        type="button"
+        id="parkSizeButton"
+        aria-expanded="false"
+        aria-controls="parkSizeSection"
+        >
+        Show park sizes by authority
+        </button>
+
+        <section id="parkSizeSection" hidden>
+        <h3>Park sizes by authority</h3>
+
+        <p>
+            The box shows the middle 50% of park areas, with a line at the median.
+            The whiskers extend to observations within 1.5 times the interquartile
+            range; points beyond them are outliers.
+            The chart uses a logarithmic area scale.
+        </p>
+
+        <div id="parkSizeContainer" aria-hidden="true">
+            <canvas id="parkSizeChart"></canvas>
+        </div>
+
+        <p>
+            The table below gives the values used to describe the plot.
+            Parks with missing, zero or negative areas are excluded because
+            the logarithmic scale requires positive values.
+        </p>
+
+        <div id="parkSizeTable"></div>
+        </section>
+        <hr>
     <p id="chartStatus" role="status"></p>
     </section>
 </main>
