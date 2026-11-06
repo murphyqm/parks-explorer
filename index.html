@@ -3,7 +3,9 @@
 <head>
   <meta name="robots" content="noindex">
   <!-- Cookie Consent by TermsFeed https://www.TermsFeed.com -->
-   <script src="js/regions.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script> 
+  <script src="js/charts.js" defer></script>
+  <script src="js/regions.js" defer></script>
 <script type="text/javascript" src="https://www.termsfeed.com/public/cookie-consent/4.2.0/cookie-consent.js" charset="UTF-8"></script>
 <script type="text/javascript" charset="UTF-8">
 document.addEventListener('DOMContentLoaded', function () {
@@ -82,6 +84,34 @@ cookieconsent.run({"notice_banner_type":"standalone","consent_type":"express","p
 
   <!-- Future regional statistics and plots can go here. -->
   <section id="regionResults"></section>
+
+  <section id="chartOptions" hidden>
+    <h2>Explore the results</h2>
+
+    <button
+        type="button"
+        id="parkCountButton"
+        aria-expanded="false"
+        aria-controls="parkCountChartSection"
+    >
+        Show park count by authority
+    </button>
+
+    <section id="parkCountChartSection" hidden>
+        <h3>Number of parks by authority</h3>
+
+        <p>
+        The exact counts are also available in the results table above.
+        Parks shared by authorities appear in each authority's count.
+        </p>
+
+        <div id="parkCountChartContainer" aria-hidden="true">
+        <canvas id="parkCountChart"></canvas>
+        </div>
+    </section>
+
+    <p id="chartStatus" role="status"></p>
+    </section>
 </main>
 </body>
 

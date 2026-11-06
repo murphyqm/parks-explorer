@@ -238,6 +238,8 @@ regionSelect.addEventListener("change", async () => {
   const regionCode = regionSelect.value;
   regionResults.replaceChildren();
 
+  resetCharts();
+
   if (!regionCode) {
     regionStatus.textContent = "Select a region to explore.";
     return;
@@ -275,6 +277,8 @@ regionSelect.addEventListener("change", async () => {
       stats: summariseParks(deduplicateParks(regionParks)),
     });
     showAuthorityStats(rows, regionName);
+    // The first row is the regional total, not an authority.
+    prepareCharts(rows.slice(1));
     regionStatus.textContent = `Statistics for ${regionName}`;
   } catch (error) {
     if (selection !== latestSelection) return;
