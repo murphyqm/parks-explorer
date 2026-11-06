@@ -189,6 +189,66 @@ cookieconsent.run({"notice_banner_type":"standalone","consent_type":"express","p
 
         <div id="parkTypeTable"></div>
         </section>
+
+    <button
+        type="button"
+        id="comparativePlotsButton"
+        aria-expanded="false"
+        aria-controls="comparativePlotsSection"
+        >
+        Show comparative plots
+    </button>
+
+    <section id="comparativePlotsSection" hidden>
+    <h2>Comparative plots</h2>
+
+    <button
+        type="button"
+        id="stackedBarButton"
+        aria-expanded="false"
+        aria-controls="stackedBarChartSection"
+        >
+        Show park types by authority
+    </button>
+
+    <section id="stackedBarChartSection" hidden>
+    <h3>Park type composition by authority</h3>
+
+    <p>
+        Stacked bar chart showing the number of parks of each type within each authority.
+        This helps identify which authorities have diverse park types vs. those dominated by a single type.
+    </p>
+
+    <div id="stackedBarContainer" aria-hidden="true" style="max-height: 600px; margin-bottom: 1rem;">
+        <canvas id="stackedBarChart"></canvas>
+    </div>
+    </section>
+
+    <button
+        type="button"
+        id="scatterPlotButton"
+        aria-expanded="false"
+        aria-controls="scatterPlotSection"
+        >
+        Show count vs. mean area scatter plot
+    </button>
+
+    <section id="scatterPlotSection" hidden>
+    <h3>Relationship between park count and mean park area</h3>
+
+    <p>
+        Scatter plot showing the relationship between the number of parks in an authority (x-axis)
+        and the mean park area (y-axis). This reveals whether authorities tend to have many small parks
+        or fewer large parks.
+    </p>
+
+    <div id="scatterPlotContainer" aria-hidden="true" style="max-height: 500px; margin-bottom: 1rem;">
+        <canvas id="scatterPlotChart"></canvas>
+    </div>
+    </section>
+
+    </section>
+
     <p id="chartStatus" role="status"></p>
     </section>
 </main>

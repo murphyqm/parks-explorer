@@ -18,6 +18,19 @@ const parkTypeAreaCanvas = document.getElementById("parkTypeAreaChart");
 const parkTypeBoxCanvas = document.getElementById("parkTypeBoxChart");
 const parkTypeBoxContainer = document.getElementById("parkTypeBoxContainer");
 
+let stackedBarChart = null;
+let scatterPlotChart = null;
+const comparativePlotsButton = document.getElementById("comparativePlotsButton");
+const comparativePlotsSection = document.getElementById("comparativePlotsSection");
+const stackedBarButton = document.getElementById("stackedBarButton");
+const stackedBarSection = document.getElementById("stackedBarChartSection");
+const stackedBarContainer = document.getElementById("stackedBarContainer");
+const stackedBarCanvas = document.getElementById("stackedBarChart");
+const scatterPlotButton = document.getElementById("scatterPlotButton");
+const scatterPlotSection = document.getElementById("scatterPlotSection");
+const scatterPlotContainer = document.getElementById("scatterPlotContainer");
+const scatterPlotCanvas = document.getElementById("scatterPlotChart");
+
 function resetCharts() {
   if (parkCountChart) {
     parkCountChart.destroy();
@@ -28,9 +41,18 @@ function resetCharts() {
   resetParkSizeChart();
   chartOptions.hidden = true;
   chartSection.hidden = true;
+  comparativePlotsSection.hidden = true;
+  stackedBarSection.hidden = true;
+  scatterPlotSection.hidden = true;
   chartStatus.textContent = "";
   parkCountButton.textContent = "Show park count by authority";
   parkCountButton.setAttribute("aria-expanded", "false");
+  comparativePlotsButton.textContent = "Show comparative plots";
+  comparativePlotsButton.setAttribute("aria-expanded", "false");
+  stackedBarButton.textContent = "Show park types by authority";
+  stackedBarButton.setAttribute("aria-expanded", "false");
+  scatterPlotButton.textContent = "Show count vs. mean area scatter plot";
+  scatterPlotButton.setAttribute("aria-expanded", "false");
 
     if (parkTypeChart) {
       parkTypeChart.destroy();
@@ -43,6 +65,14 @@ function resetCharts() {
     if (parkTypeBoxChart) {
       parkTypeBoxChart.destroy();
       parkTypeBoxChart = null;
+    }
+    if (stackedBarChart) {
+      stackedBarChart.destroy();
+      stackedBarChart = null;
+    }
+    if (scatterPlotChart) {
+      scatterPlotChart.destroy();
+      scatterPlotChart = null;
     }
 }
 
@@ -556,5 +586,221 @@ parkSizeButton.addEventListener("click", () => {
     console.error("Could not create park size chart:", error);
     resetParkSizeChart();
     chartStatus.textContent = "Could not create the park size chart.";
+  }
+});
+
+// Comparative plots section
+comparativePlotsButton.addEventListener("click", () => {
+  if (!comparativePlotsSection.hidden) {
+    comparativePlotsSection.hidden = true;
+    stackedBarSection.hidden = true;
+    scatterPlotSection.hidden = true;
+    if (stackedBarChart) stackedBarChart.destroy();
+    if (scatterPlotChart) scatterPlotChart.destroy();
+    stackedBarChart = null;
+    scatterPlotChart = null;
+    chartStatus.textContent = "Comparative plots hidden.";
+    comparativePlotsButton.textContent = "Show comparative plots";
+    comparativePlotsButton.setAttribute("aria-expanded", "false");
+    stackedBarButton.textContent = "Show park types by authority";
+    stackedBarButton.setAttribute("aria-expanded", "false");
+    scatterPlotButton.textContent = "Show count vs. mean area scatter plot";
+    scatterPlotButton.setAttribute("aria-expanded", "false");
+    return;
+  }
+
+  comparativePlotsSection.hidden = false;
+  comparativePlotsButton.textContent = "Hide comparative plots";
+  comparativePlotsButton.setAttribute("aria-expanded", "true");
+});
+
+// Stacked bar chart
+stackedBarButton.addEventListener("click", () => {
+  if (!stackedBarSection.hidden) {
+    if (stackedBarChart) stackedBarChart.destroy();
+    stackedBarChart = null;
+    stackedBarSection.hidden = true;
+    chartStatus.textContent = "Stacked bar chart hidden.";
+    stackedBarButton.textContent = "Show park types by authority";
+    stackedBarButton.setAttribute("aria-expanded", "false");
+    return;
+  }
+
+  if (typeof Chart === "undefined") {
+    chartStatus.textContent = "The chart library could not be loaded.";
+    return;
+  }
+
+  stackedBarSection.hidden = false;
+
+  try {
+    // Group parks by authority and type
+    const authorityTypeData = new Map();
+    
+    for (const row of chartRows) {
+      if (!authorityTypeData.has(row.authorityName)) {
+        authorityTypeData.set(row.authorityName, new Map());
+      }
+      
+      const typeMap = authorityTypeData.get(row.authorityName);
+      
+      for (const park of row.parks) {
+        const typeOS = normalizeType(park.typeOS);
+        const typeOSM = normalizeType(park.typeOSM);
+        const type = typeOS || typeOSM || "(Unknown)";
+        
+        typeMap.set(type, (typeMap.get(type) || 0) + 1);
+      }
+    }
+    
+    // Get all unique types
+    const allTypes = new Set();
+    for (const typeMap of authorityTypeData.values()) {
+      for (const type of typeMap.keys()) {
+        allTypes.add(type);
+      }
+    }
+    const sortedTypes = Array.from(allTypes).sort();
+    
+    // Color palette (reusing the existing colors)
+    const colors = [
+      "rgba(0, 122, 80, 0.7)",
+      "rgba(0, 102, 153, 0.7)",
+      "rgba(204, 102, 0, 0.7)",
+      "rgba(153, 51, 153, 0.7)",
+      "rgba(51, 153, 102, 0.7)",
+      "rgba(204, 51, 51, 0.7)",
+      "rgba(153, 153, 0, 0.7)",
+      "rgba(102, 102, 102, 0.7)",
+    ];
+    
+    // Create datasets
+    const datasets = sortedTypes.map((type, index) => ({
+      label: type,
+      data: Array.from(authorityTypeData.keys()).map(authority => 
+        authorityTypeData.get(authority).get(type) || 0
+      ),
+      backgroundColor: colors[index % colors.length],
+      borderColor: "#fff",
+      borderWidth: 1,
+    }));
+    
+    stackedBarContainer.style.height = `${Math.max(400, chartRows.length * 30)}px`;
+    
+    stackedBarChart = new Chart(stackedBarCanvas, {
+      type: "bar",
+      data: {
+        labels: Array.from(authorityTypeData.keys()),
+        datasets,
+      },
+      options: {
+        indexAxis: "y",
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        plugins: {
+          legend: {
+            position: "bottom",
+            labels: { font: { size: 11 } },
+          },
+          tooltip: { enabled: true },
+        },
+        scales: {
+          x: {
+            stacked: true,
+            title: { display: true, text: "Number of parks" },
+          },
+          y: {
+            stacked: true,
+          },
+        },
+      },
+    });
+    
+    chartStatus.textContent = "Stacked bar chart displayed.";
+    stackedBarButton.textContent = "Hide park types by authority";
+    stackedBarButton.setAttribute("aria-expanded", "true");
+  } catch (error) {
+    chartStatus.textContent = `Error rendering stacked bar chart: ${error.message}`;
+    console.error("Stacked bar chart error:", error);
+  }
+});
+
+// Scatter plot
+scatterPlotButton.addEventListener("click", () => {
+  if (!scatterPlotSection.hidden) {
+    if (scatterPlotChart) scatterPlotChart.destroy();
+    scatterPlotChart = null;
+    scatterPlotSection.hidden = true;
+    chartStatus.textContent = "Scatter plot hidden.";
+    scatterPlotButton.textContent = "Show count vs. mean area scatter plot";
+    scatterPlotButton.setAttribute("aria-expanded", "false");
+    return;
+  }
+
+  if (typeof Chart === "undefined") {
+    chartStatus.textContent = "The chart library could not be loaded.";
+    return;
+  }
+
+  scatterPlotSection.hidden = false;
+
+  try {
+    // Prepare scatter data
+    const scatterData = chartRows.map(row => ({
+      x: row.stats.parkCount,
+      y: row.stats.meanAreaM2 ? row.stats.meanAreaM2 / 10000 : 0,
+      authorityName: row.authorityName,
+    }));
+    
+    scatterPlotChart = new Chart(scatterPlotCanvas, {
+      type: "scatter",
+      data: {
+        datasets: [{
+          label: "Authorities",
+          data: scatterData,
+          backgroundColor: "rgba(0, 122, 80, 0.6)",
+          borderColor: "#007a50",
+          borderWidth: 2,
+          pointRadius: 5,
+          pointHoverRadius: 7,
+        }],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        animation: false,
+        plugins: {
+          legend: { display: true },
+          tooltip: {
+            enabled: true,
+            callbacks: {
+              label: function(context) {
+                const point = context.raw;
+                return `${point.authorityName}: ${point.x} parks, mean area ${point.y.toLocaleString(undefined, { maximumFractionDigits: 2 })} ha`;
+              },
+              title: () => "",
+            },
+          },
+        },
+        scales: {
+          x: {
+            type: "linear",
+            position: "bottom",
+            title: { display: true, text: "Number of parks" },
+          },
+          y: {
+            title: { display: true, text: "Mean park area (hectares)" },
+          },
+        },
+      },
+    });
+    
+    chartStatus.textContent = "Scatter plot displayed.";
+    scatterPlotButton.textContent = "Hide count vs. mean area scatter plot";
+    scatterPlotButton.setAttribute("aria-expanded", "true");
+  } catch (error) {
+    chartStatus.textContent = `Error rendering scatter plot: ${error.message}`;
+    console.error("Scatter plot error:", error);
   }
 });
