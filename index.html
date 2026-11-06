@@ -63,11 +63,22 @@ cookieconsent.run({"notice_banner_type":"standalone","consent_type":"express","p
   <select name="regionSelect" id="regionSelect" disabled>
     <option value="">Loading regions...</option>
   </select>
-  <p>Please do not refresh while authorities load.</p>
+  <p>Please do not refresh while authorities load. Larger regions with more authorities will take longer to load.
+    <br>
+    <br>
+    Note that some parks which sit along authority boundaries are included in the statistics for each authority overview;
+    however, these have been deduplicated in the overall regional stats (based on having identical area and names).
+    <br>
+    <br>
+    Inclusion of a park in an authority area does not imply ownership/responsibility of the Local Authority, nor is it
+    a guarantee of public access.
+  </p>
 
   <p id="regionStatus" role="status" aria-live="polite">
     Loading regions…
   </p>
+
+  <hr>
 
   <!-- Future regional statistics and plots can go here. -->
   <section id="regionResults"></section>

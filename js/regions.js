@@ -93,10 +93,13 @@ async function loadAuthorityParks(authority) {
     }
 
     return {
+      id: properties.park_offical_id,
       name: properties["Park Name"],
       areaM2: area ?? null,
       typeOS: properties["Type (OS)"],
       typeOSM: properties["Type (OSM)"],
+      authorityCode: authority.authorityCode,
+      authorityName: authority.authorityName,
     };
   });
 }
@@ -123,6 +126,7 @@ function summariseParks(parks) {
     meanAreaM2: areas.length ? totalAreaM2 / areas.length : null,
     medianAreaM2,
     missingAreas: parks.length - areas.length,
+    maxAreaM2: areas.length ? areas[areas.length - 1] : null,
   };
 }
 
@@ -147,6 +151,7 @@ function showAuthorityStats(rows, regionName) {
     "Total parkland area",
     "Mean area per park",
     "Median area per park",
+    "Maximum area per park",
   ]) {
     const th = document.createElement("th");
     th.scope = "col";
@@ -169,6 +174,7 @@ function showAuthorityStats(rows, regionName) {
       formatArea(stats.totalAreaM2),
       formatArea(stats.meanAreaM2),
       formatArea(stats.medianAreaM2),
+      formatArea(stats.maxAreaM2),
     ]) {
       row.insertCell().textContent = value;
     }
@@ -177,6 +183,53 @@ function showAuthorityStats(rows, regionName) {
   regionResults.replaceChildren(table);
 }
 
+
+function deduplicateParks(parks) {
+  const unique = [];
+  const byArea = new Map();
+  let duplicates = 0;
+  let unchecked = 0;
+
+  for (const park of parks) {
+    const name = typeof park.name === "string"
+      ? park.name.trim().toLowerCase()
+      : "";
+
+    if (park.areaM2 === null || !name || name === "null") {
+      unique.push(park);
+      unchecked++;
+      continue;
+    }
+
+    const candidates = byArea.get(park.areaM2) ?? [];
+
+    const match = candidates.find((candidate) =>
+      candidate.authorityCode !== park.authorityCode &&
+      candidate.name.trim().toLowerCase() === name
+    );
+
+    if (match) {
+      duplicates++;
+      console.log("Possible duplicate excluded:", {
+        name: park.name,
+        areaM2: park.areaM2,
+        keptFrom: match.authorityName,
+        excludedFrom: park.authorityName,
+      });
+    } else {
+      unique.push(park);
+      candidates.push(park);
+      byArea.set(park.areaM2, candidates);
+    }
+  }
+
+  console.log(`Excluded ${duplicates} possible duplicates from the region.`);
+  if (unchecked) {
+    console.warn(`${unchecked} parks lacked a name or area and were not checked.`);
+  }
+
+  return unique;
+}
 
 let latestSelection = 0;
 
@@ -196,6 +249,7 @@ regionSelect.addEventListener("change", async () => {
   try {
     const authorities = await loadAuthorities(regionCode);
     const rows = [];
+    const regionParks = [];
 
     for (const authority of authorities) {
       // Ignore old requests if the user has selected another region.
@@ -203,6 +257,9 @@ regionSelect.addEventListener("change", async () => {
 
       regionStatus.textContent = `Loading ${authority.authorityName}...`;
       const parks = await loadAuthorityParks(authority);
+      for (const park of parks) {
+        regionParks.push(park);
+      }
 
       rows.push({
         authorityName: authority.authorityName,
@@ -213,6 +270,10 @@ regionSelect.addEventListener("change", async () => {
     if (selection !== latestSelection) return;
 
     rows.sort((a, b) => a.authorityName.localeCompare(b.authorityName));
+    rows.unshift({
+      authorityName: `${regionName} — region total`,
+      stats: summariseParks(deduplicateParks(regionParks)),
+    });
     showAuthorityStats(rows, regionName);
     regionStatus.textContent = `Statistics for ${regionName}`;
   } catch (error) {
