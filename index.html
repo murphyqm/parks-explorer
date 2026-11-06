@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta name="robots" content="noindex">
+  <!-- Cookie Consent by TermsFeed https://www.TermsFeed.com -->
+   <script src="js/regions.js" defer></script>
+<script type="text/javascript" src="https://www.termsfeed.com/public/cookie-consent/4.2.0/cookie-consent.js" charset="UTF-8"></script>
+<script type="text/javascript" charset="UTF-8">
+document.addEventListener('DOMContentLoaded', function () {
+cookieconsent.run({"notice_banner_type":"standalone","consent_type":"express","palette":"light","language":"en","page_load_consent_levels":["strictly-necessary"],"notice_banner_reject_button_hide":false,"preferences_center_close_button_hide":false,"page_refresh_confirmation_buttons":false,"website_name":"The Safer Parks Dashboard","website_privacy_policy_url":"https://safer-parks.github.io/privacy.html"});
+});
+</script>
+
+<!-- Google Analytics -->
+<!-- Google tag (gtag.js) -->
+<script type="text/plain" data-cookie-consent="tracking" async src="https://www.googletagmanager.com/gtag/js?id=G-7P97HQSGPZ"></script>
+<script type="text/plain" data-cookie-consent="tracking">
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-7P97HQSGPZ');
+</script>
+<!-- end of Google Analytics-->
+
+<noscript>Free cookie consent management tool by <a href="https://www.termsfeed.com/">TermsFeed</a></noscript>
+<!-- End Cookie Consent by TermsFeed https://www.TermsFeed.com -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Safer Parks Dashboard</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="css/icon-parks4.svg">
+    
+    <!-- Pico CSS Framework - Jade Palette -->
+    <link rel="stylesheet" href="css/pico.jade.min.css">
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.min.css" integrity="sha384-b8ANgTJvdlAnWM5YGMpKn7Kodm+1k7NYNG9zdjTCcZcKatzYHwZ0RLdWarbJJVzU" crossorigin="anonymous">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/light-theme.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav>
+        <ul>
+            <li><a href="https://Safer-Parks.github.io/" target="_blank" rel="noopener noreferrer" title="Return to homepage"><strong>The Safer Parks Dashboard</strong></a><span id="navParkName" style="display:none; margin-left: 2rem;"></span></li>
+            <li class="nav-push-right"><a href="./" title="Bookmark this link for quick access to the dashboard">Reload stats explorer</a></li>
+        </ul>
+    </nav>
+
+<br>
+<br>
+
+<main class="container">
+  <h1>Explore park statistics</h1>
+
+  <label for="regionSelect">Select a region:</label>
+  <select name="regionSelect" id="regionSelect" disabled>
+    <option value="">Loading regions...</option>
+  </select>
+  <p>Please do not refresh while authorities load.</p>
+
+  <p id="regionStatus" role="status" aria-live="polite">
+    Loading regions…
+  </p>
+
+  <!-- Future regional statistics and plots can go here. -->
+  <section id="regionResults"></section>
+</main>
+</body>
+
+</html>

@@ -1,0 +1,693 @@
+/* Dashboard-specific styles */
+
+h1 {
+  font-family: "MrDodo", serif !important;
+  color: #572b70 !important;
+  margin-top: 1rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+
+/* Mobile Notice Banner */
+.mobile-notice {
+  display: none;
+  background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+  color: white;
+  padding: 1rem;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 99999;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.mobile-notice-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.mobile-notice-content svg {
+  flex-shrink: 0;
+  margin-top: 0.25rem;
+}
+
+.mobile-notice-text {
+  flex: 1;
+}
+
+.mobile-notice-text strong {
+  display: block;
+  font-size: 1.1rem;
+  margin-bottom: 0.25rem;
+}
+
+.mobile-notice-text p {
+  margin: 0;
+  font-size: 0.95rem;
+  opacity: 0.95;
+}
+
+.mobile-notice-close {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+  flex-shrink: 0;
+}
+
+.mobile-notice-close:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Show mobile notice only on small screens */
+@media (max-width: 1024px) {
+  .mobile-notice {
+    display: block;
+  }
+}
+
+/* Bench marker styling - remove default outlines */
+.leaflet-image-layer.leaflet-interactive,
+.leaflet-marker-icon.leaflet-interactive,
+.leaflet-pane > svg path.leaflet-interactive,
+svg.leaflet-image-layer.leaflet-interactive path {
+  pointer-events: visiblePainted;
+  pointer-events: auto;
+}
+
+/* Override button styling for Leaflet markers */
+.leaflet-marker-icon[role="button"] {
+  --pico-background-color: transparent !important;
+  --pico-border-color: transparent !important;
+  --pico-color: inherit !important;
+  --pico-box-shadow: none !important;
+  padding: 0 !important;
+  border: none !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+.bench-marker {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.bench-marker div {
+  outline: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* Modal content headings */
+.modal-box .modal-content h2,
+.modal-box .modal-content h3,
+.modal-box .modal-content h4 {
+  font-family: "MrDodo", serif !important;
+  color: #572b70 !important;
+  margin-top: 1rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.modal-box .modal-content h2 {
+  font-size: 1.2rem !important;
+}
+
+.modal-box .modal-content h3 {
+  font-size: 1.1rem !important;
+}
+
+.modal-box .modal-content h4 {
+  font-size: 1rem !important;
+}
+
+/* Modal box sizing */
+.modal-box {
+  max-width: 650px !important;
+  width: 95% !important;
+  padding: 2rem 2rem 2rem 3rem !important;
+}
+
+/* Dashboard page styles moved from index.html. Keep after light-theme.css overrides. */
+/* Font imports */
+@font-face {
+  font-family: "MrDodo";
+  src: url("MrDodo-Regular.otf") format("opentype");
+  font-display: swap;
+}
+
+#map {
+  width: 100%;
+  height: 100vh;
+}
+
+#loadingNotice {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2000;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 1.1rem;
+  background: #fff;
+  color: #30452d;
+  font-weight: 600;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+#loadingNotice.visible {
+  display: flex;
+}
+
+#loadingNotice .spinner {
+  width: 1.1rem;
+  height: 1.1rem;
+  border: 3px solid #d6e0cf;
+  border-top-color: #4f6c37;
+  border-radius: 50%;
+  animation: loading-spin 0.8s linear infinite;
+}
+
+@keyframes loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+aside {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  width: 420px;
+  max-height: 90vh;
+  overflow-y: auto;
+  overflow-x: visible;
+}
+
+/* Headline styling */
+nav strong {
+  font-family: "MrDodo", serif;
+  color: #572b70;
+  font-size: 1.2rem;
+}
+
+/* Park name in nav */
+#navParkName {
+  font-family: "MrDodo", serif;
+  color: #572b70;
+  font-size: 1.2rem;
+}
+
+/* Minimal basemap styling */
+.minimal-basemap {
+  filter: grayscale(100%) brightness(1.15) contrast(0.9);
+}
+
+/* Zoom controls padding */
+.leaflet-bottom.leaflet-right {
+  padding-right: 5px;
+  padding-bottom: 35px;
+}
+
+/* Hide Leaflet's default attribution control */
+.leaflet-control-attribution {
+  display: none !important;
+}
+
+/* Style floating attribution */
+.floating-attribution {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  line-height: 1.4;
+}
+
+.floating-attribution a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+/* Floating Scale Bar Styling */
+.leaflet-control-scale {
+  position: fixed !important;
+  bottom: 0.5rem !important;
+  left: 50% !important;
+  transform: translateX(-50%);
+  margin-left: 200px !important;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+  padding: 4px 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  z-index: 400;
+}
+
+.leaflet-control-scale-line {
+  border: 2px solid #333;
+  border-top: none;
+  color: #333;
+  font-size: 11px;
+  line-height: 1.1;
+  padding: 2px 5px 1px;
+  background: transparent;
+  text-shadow: none;
+}
+
+/* Layer toggles styling */
+#dataLayerToggles {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+#dataLayerToggles label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+#dataLayerToggles input[type="checkbox"] {
+  margin: 0;
+}
+
+/* Accordion panel styling */
+.accordion-panel {
+  display: block;
+  overflow: hidden;
+}
+
+/* Legend item styling */
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.legend-marker {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.legend-marker.outline {
+  border: 2px solid #4f6c37;
+  background: white;
+}
+
+.legend-marker.filled {
+  background: #4f6c37;
+}
+
+.legend-marker.filled-large {
+  background: #572b70;
+}
+
+.legend-marker.circle {
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+}
+
+.legend-marker.circle.primary {
+  background: #ee655f;
+}
+
+.legend-marker.circle.secondary {
+  background: #95a5a6;
+}
+
+/* Force legend positioning on right side */
+aside#legendPanel {
+  position: fixed !important;
+  right: 10px !important;
+  top: 75px !important;
+  left: auto !important;
+  width: 250px !important;
+  max-width: none !important;
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+  background: white;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+/* Foliage tooltip styling */
+.foliage-tooltip {
+  background: rgba(30, 125, 50, 0.95) !important;
+  color: white !important;
+  border-radius: 4px;
+  padding: 8px 12px !important;
+  font-size: 0.85rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.foliage-tooltip::before {
+  border-top-color: rgba(30, 125, 50, 0.95) !important;
+}
+
+/* Park tooltip styling */
+.park-tooltip {
+  background: white !important;
+  color: black !important;
+  border-radius: 4px;
+  padding: 8px 12px !important;
+  font-size: 0.85rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.park-tooltip::before {
+  border-top-color: white !important;
+}
+
+/* NACH tooltip styling */
+.nach-tooltip {
+  background: rgba(100, 100, 100, 0.95) !important;
+  color: white !important;
+  border-radius: 4px;
+  padding: 8px 12px !important;
+  font-size: 0.85rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.nach-tooltip::before {
+  border-top-color: rgba(100, 100, 100, 0.95) !important;
+}
+
+/* Toilet tooltip styling */
+.toilet-tooltip {
+  background: rgba(0, 123, 255, 0.95) !important;
+  color: white !important;
+  border-radius: 4px;
+  padding: 8px 12px !important;
+  font-size: 0.85rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.toilet-tooltip::before {
+  border-top-color: rgba(0, 123, 255, 0.95) !important;
+}
+
+/* Bench tooltip styling */
+.bench-tooltip {
+  background: rgba(76, 175, 80, 0.95) !important;
+  color: white !important;
+  border-radius: 4px;
+  padding: 8px 12px !important;
+  font-size: 0.85rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.bench-tooltip::before {
+  border-top-color: rgba(76, 175, 80, 0.95) !important;
+}
+
+/* Cycling network tooltip styling */
+.cycling-tooltip {
+  background: rgba(255, 107, 53, 0.95) !important;
+  color: white !important;
+  border-radius: 4px;
+  padding: 8px 12px !important;
+  font-size: 0.85rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.cycling-tooltip::before {
+  border-top-color: rgba(255, 107, 53, 0.95) !important;
+}
+
+/* Pocket parks tooltip styling */
+.pocket-park-tooltip {
+  background: rgba(255, 175, 145, 0.95) !important;
+  color: #000 !important;
+  border-color: rgba(255, 107, 53, 0.95) !important;
+  border-radius: 4px;
+  padding: 8px 12px !important;
+  font-size: 0.85rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.pocket-park-tooltip::before {
+  border-top-color: rgba(255, 107, 53, 0.95) !important;
+}
+
+/* Features tooltip styling */
+.features-in-parks-tooltip {
+  background: var(--feature-colour, rgba(76, 175, 80, 0.95)) !important;
+  color: var(--feature-text, white) !important;
+  border-radius: 4px;
+  padding: 8px 12px !important;
+  font-size: 0.75rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.features-in-parks-tooltip::before {
+  border-top-color: var(--feature-colour, rgba(76, 175, 80, 0.95)) !important;
+}
+
+/* Toggle label spacing */
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.toggle-label > input {
+  flex: 0 0 auto;
+}
+
+.toggle-label > span {
+  flex: 1 1 auto;
+}
+
+.toggle-label > button {
+  flex: 0 0 auto;
+}
+
+/* Info icon button styling */
+.info-icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: opacity 0.2s ease;
+}
+
+.info-icon-btn:hover {
+  opacity: 0.7;
+}
+
+.info-icon-btn svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Modal overlay */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 2000;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+/* Modal box */
+.modal-box {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+  padding: 2rem;
+}
+
+/* Modal close button */
+.modal-close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #666;
+  transition: color 0.2s ease;
+}
+
+.modal-close-btn:hover {
+  color: #333;
+}
+
+.modal-close-btn:focus-visible,
+nav li a:focus-visible,
+nav li .nav-link-btn:focus-visible {
+  outline: 3px solid #572b70;
+  outline-offset: 2px;
+}
+
+/* Modal title */
+.modal-title {
+  font-family: "MrDodo", serif;
+  color: #572b70;
+  font-size: 1.3rem;
+  margin: 0 0 1rem 0;
+  padding-right: 2rem;
+}
+
+/* Modal content */
+.modal-content {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #333;
+  box-shadow: none;
+}
+
+/* Space between adjacent toggle labels in accordion panel (regional level) */
+.accordion-panel > .toggle-label + .toggle-label {
+  margin-top: 0.75rem;
+}
+
+/* Navigation styling */
+nav ul {
+  display: flex;
+  align-items: center;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  gap: 1rem;
+}
+
+nav li a {
+  color: #572b70;
+  text-decoration: none;
+  font-weight: 500;
+  font-family: "MrDodo", serif;
+}
+
+nav li a:hover,
+nav li .nav-link-btn:hover {
+  text-decoration: underline;
+}
+
+/* Native button that looks identical to the nav links */
+nav li .nav-link-btn {
+  all: unset;
+  box-sizing: border-box;
+  cursor: pointer;
+  color: #572b70;
+  font-weight: 500;
+  font-family: "MrDodo", serif;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+/* Layout helpers moved from inline styles */
+.nav-push-right {
+  margin-left: auto;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.reset-map-btn {
+  margin-top: 1rem;
+}
+
+.panel-hint {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.info-icon-img {
+  width: 100%;
+  height: 100%;
+}
+
+/* Facility (toilet/bench) markers: keep Pico from restyling them */
+.leaflet-marker-icon.facility-marker {
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  margin-block: 0;
+  box-shadow: none !important;
+  outline: none !important;
+  width: 20px;
+  height: 20px;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.35));
+}
+
+.facility-marker svg {
+  display: block;
+  pointer-events: none;
+}
