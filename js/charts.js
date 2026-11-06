@@ -8,6 +8,16 @@ const chartStatus = document.getElementById("chartStatus");
 let parkCountChart = null;
 let chartRows = [];
 
+let parkTypeChart = null;
+let parkTypeAreaChart = null;
+let parkTypeBoxChart = null;
+const parkTypeButton = document.getElementById("parkTypeButton");
+const parkTypeSection = document.getElementById("parkTypeSection");
+const parkTypeCountCanvas = document.getElementById("parkTypeCountChart");
+const parkTypeAreaCanvas = document.getElementById("parkTypeAreaChart");
+const parkTypeBoxCanvas = document.getElementById("parkTypeBoxChart");
+const parkTypeBoxContainer = document.getElementById("parkTypeBoxContainer");
+
 function resetCharts() {
   if (parkCountChart) {
     parkCountChart.destroy();
@@ -21,6 +31,19 @@ function resetCharts() {
   chartStatus.textContent = "";
   parkCountButton.textContent = "Show park count by authority";
   parkCountButton.setAttribute("aria-expanded", "false");
+
+    if (parkTypeChart) {
+      parkTypeChart.destroy();
+      parkTypeChart = null;
+    }
+    if (parkTypeAreaChart) {
+      parkTypeAreaChart.destroy();
+      parkTypeAreaChart = null;
+    }
+    if (parkTypeBoxChart) {
+      parkTypeBoxChart.destroy();
+      parkTypeBoxChart = null;
+    }
 }
 
 function prepareCharts(authorityRows) {
@@ -69,10 +92,9 @@ parkCountButton.addEventListener("click", () => {
         responsive: true,
         maintainAspectRatio: false,
         animation: false,
-        events: [],
         plugins: {
           legend: { display: false },
-          tooltip: { enabled: false },
+          tooltip: { enabled: true },
         },
         scales: {
           x: {
@@ -196,6 +218,264 @@ function resetParkSizeChart() {
   parkSizeButton.setAttribute("aria-expanded", "false");
 }
 
+parkTypeButton.addEventListener("click", () => {
+  if (!parkTypeSection.hidden) {
+    if (parkTypeChart) parkTypeChart.destroy();
+    if (parkTypeAreaChart) parkTypeAreaChart.destroy();
+    if (parkTypeBoxChart) parkTypeBoxChart.destroy();
+    parkTypeChart = null;
+    parkTypeAreaChart = null;
+    parkTypeBoxChart = null;
+    parkTypeSection.hidden = true;
+    chartStatus.textContent = "Type charts hidden.";
+    parkTypeButton.textContent = "Show park types";
+    parkTypeButton.setAttribute("aria-expanded", "false");
+    return;
+  }
+
+  if (typeof Chart === "undefined") {
+    chartStatus.textContent = "The chart library could not be loaded.";
+    return;
+  }
+
+  parkTypeSection.hidden = false;
+  
+  try {
+    // Deduplicate parks to match the regional total in the table
+    const deduplicatedParks = deduplicateParks(currentRegionParks);
+    const typeSummaryData = typeSummary(deduplicatedParks);
+    
+    // Show type summary table
+    showParkTypeTable(typeSummaryData, currentRegionName);
+    
+    // Consistent color palette
+    const colors = [
+      "rgba(0, 122, 80, 0.7)",    // Jade
+      "rgba(0, 102, 153, 0.7)",   // Blue
+      "rgba(204, 102, 0, 0.7)",   // Orange
+      "rgba(153, 51, 153, 0.7)",  // Purple
+      "rgba(51, 153, 102, 0.7)",  // Green
+      "rgba(204, 51, 51, 0.7)",   // Red
+      "rgba(153, 153, 0, 0.7)",   // Yellow
+      "rgba(102, 102, 102, 0.7)", // Gray
+    ];
+    
+    const typeLabels = typeSummaryData.map(item => item.type || "(Unknown)");
+    const countData = typeSummaryData.map(item => item.count);
+    const areaData = typeSummaryData.map(item => item.totalAreaM2 / 10000); // Convert to hectares
+    const chartColors = colors.slice(0, typeSummaryData.length);
+    
+    const chartOptions = {
+      responsive: true,
+      maintainAspectRatio: true,
+      aspectRatio: 1.5,
+      animation: false,
+      plugins: {
+        legend: {
+          position: "bottom",
+          labels: {
+            padding: 12,
+            font: { size: 11 },
+          },
+        },
+      },
+    };
+    
+    // Count chart
+    parkTypeChart = new Chart(parkTypeCountCanvas, {
+      type: "doughnut",
+      data: {
+        labels: typeLabels,
+        datasets: [{
+          data: countData,
+          backgroundColor: chartColors,
+          borderColor: "#fff",
+          borderWidth: 2,
+        }],
+      },
+      options: {
+        ...chartOptions,
+        plugins: {
+          ...chartOptions.plugins,
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const label = context.label || "";
+                const value = context.parsed;
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = ((value / total) * 100).toFixed(1);
+                return `${label}: ${value} parks (${percentage}%)`;
+              },
+            },
+          },
+        },
+      },
+    });
+    
+    // Area chart
+    parkTypeAreaChart = new Chart(parkTypeAreaCanvas, {
+      type: "doughnut",
+      data: {
+        labels: typeLabels,
+        datasets: [{
+          data: areaData,
+          backgroundColor: chartColors,
+          borderColor: "#fff",
+          borderWidth: 2,
+        }],
+      },
+      options: {
+        ...chartOptions,
+        plugins: {
+          ...chartOptions.plugins,
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const label = context.label || "";
+                const value = context.parsed;
+                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                const percentage = ((value / total) * 100).toFixed(1);
+                return `${label}: ${value.toLocaleString(undefined, { maximumFractionDigits: 1 })} ha (${percentage}%)`;
+              },
+            },
+          },
+        },
+      },
+    });
+    
+    // Box plot by type
+    if (typeof ChartBoxPlot === "undefined") {
+      chartStatus.textContent = "The box plot library could not be loaded.";
+      return;
+    }
+
+    // Group parks by type
+    const typeAreaData = new Map();
+    for (const park of deduplicatedParks) {
+      const typeOS = normalizeType(park.typeOS);
+      const typeOSM = normalizeType(park.typeOSM);
+      const type = typeOS || typeOSM;
+
+      if (!type || park.areaM2 === null) continue;
+
+      if (!typeAreaData.has(type)) {
+        typeAreaData.set(type, []);
+      }
+      // Convert to hectares and filter for positive values
+      const areaHa = park.areaM2 / 10000;
+      if (areaHa > 0) {
+        typeAreaData.get(type).push(areaHa);
+      }
+    }
+
+    // Sort by median area descending
+    const typeBoxData = Array.from(typeAreaData.entries())
+      .map(([type, areas]) => ({
+        type,
+        areas: areas.sort((a, b) => a - b),
+        summary: boxSummary(areas),
+        excluded: deduplicatedParks.filter(p => {
+          const typeOS = normalizeType(p.typeOS);
+          const typeOSM = normalizeType(p.typeOSM);
+          const t = typeOS || typeOSM;
+          return t === type && (p.areaM2 === null || p.areaM2 <= 0);
+        }).length,
+      }))
+      .filter(item => item.areas.length > 0)
+      .sort((a, b) => (b.summary?.median || 0) - (a.summary?.median || 0));
+
+    if (!typeBoxData.length) {
+      chartStatus.textContent = "No positive park areas are available to plot by type.";
+      return;
+    }
+
+    // Show box summary table
+    const typeBoxTable = document.getElementById("parkTypeBoxTable");
+    const table = document.createElement("table");
+    const caption = table.createCaption();
+    caption.textContent = `Park area distribution by type`;
+
+    const header = table.createTHead().insertRow();
+    for (const label of [
+      "Park type",
+      "Number of parks",
+      "Q1 (hectares)",
+      "Median (hectares)",
+      "Q3 (hectares)",
+      "Min whisker (hectares)",
+      "Max whisker (hectares)",
+      "Outliers",
+    ]) {
+      const th = document.createElement("th");
+      th.scope = "col";
+      th.textContent = label;
+      header.appendChild(th);
+    }
+
+    const body = table.createTBody();
+    for (const { type, areas, summary, excluded } of typeBoxData) {
+      const row = body.insertRow();
+      const typeHeader = document.createElement("th");
+      typeHeader.scope = "row";
+      typeHeader.textContent = type;
+      row.appendChild(typeHeader);
+
+      row.insertCell().textContent = areas.length;
+      row.insertCell().textContent = summary.q1.toLocaleString(undefined, { maximumFractionDigits: 2 });
+      row.insertCell().textContent = summary.median.toLocaleString(undefined, { maximumFractionDigits: 2 });
+      row.insertCell().textContent = summary.q3.toLocaleString(undefined, { maximumFractionDigits: 2 });
+      row.insertCell().textContent = summary.whiskerMin.toLocaleString(undefined, { maximumFractionDigits: 2 });
+      row.insertCell().textContent = summary.whiskerMax.toLocaleString(undefined, { maximumFractionDigits: 2 });
+      row.insertCell().textContent = summary.outlierCount;
+    }
+
+    typeBoxTable.replaceChildren(table);
+
+    // Set container height dynamically
+    parkTypeBoxContainer.style.height = `${Math.max(300, typeBoxData.length * 50)}px`;
+
+    // Create box plot
+    parkTypeBoxChart = new Chart(parkTypeBoxCanvas, {
+      type: "boxplot",
+      data: {
+        labels: typeBoxData.map((item) => item.type),
+        datasets: [{
+          label: "Park area",
+          data: typeBoxData.map((item) => item.areas),
+          backgroundColor: "rgba(0, 122, 80, 0.65)",
+          borderColor: "#007a50",
+          borderWidth: 1,
+          outlierColor: "#007a50",
+          outlierRadius: 2,
+        }],
+      },
+      options: {
+        indexAxis: "y",
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { enabled: true },
+        },
+        scales: {
+          x: {
+            type: "logarithmic",
+            title: { display: true, text: "Park area (hectares, log scale)" },
+          },
+        },
+      },
+    });
+    
+    chartStatus.textContent = "Type charts displayed.";
+    parkTypeButton.textContent = "Hide park types";
+    parkTypeButton.setAttribute("aria-expanded", "true");
+  } catch (error) {
+    chartStatus.textContent = `Error rendering type charts: ${error.message}`;
+    console.error("Type chart error:", error);
+  }
+});
+
 parkSizeButton.addEventListener("click", () => {
   if (!parkSizeSection.hidden) {
     resetParkSizeChart();
@@ -253,10 +533,9 @@ parkSizeButton.addEventListener("click", () => {
         responsive: true,
         maintainAspectRatio: false,
         animation: false,
-        events: [],
         plugins: {
           legend: { display: false },
-          tooltip: { enabled: false },
+          tooltip: { enabled: true },
         },
         scales: {
           x: {

@@ -141,8 +141,54 @@ cookieconsent.run({"notice_banner_type":"standalone","consent_type":"express","p
         </p>
 
         <div id="parkSizeTable"></div>
+
+        
         </section>
-        <hr>
+        <button
+            type="button"
+            id="parkTypeButton"
+            aria-expanded="false"
+            aria-controls="parkTypeSection"
+            >
+            Show park types
+        </button>
+
+        <section id="parkTypeSection" hidden>
+        <h3>Distribution of park types</h3>
+
+        <p>
+            Parks can have multiple types listed together (e.g., "Park, Recreation Ground").
+            Types shown as they appear in the data, with formatting cleaned for readability.
+        </p>
+
+        <div id="parkTypeTable"></div>
+
+        <div id="parkTypeChartsContainer" aria-hidden="true" style="display: flex; gap: 1rem; margin-bottom: 1rem; max-height: 400px;">
+            <div style="flex: 1; min-width: 0;">
+                <h4 style="text-align: center; margin-bottom: 0.5rem; font-size: 0.95rem;">Number of parks</h4>
+                <canvas id="parkTypeCountChart"></canvas>
+            </div>
+            <div style="flex: 1; min-width: 0;">
+                <h4 style="text-align: center; margin-bottom: 0.5rem; font-size: 0.95rem;">Total area</h4>
+                <canvas id="parkTypeAreaChart"></canvas>
+            </div>
+        </div>
+
+        <h4 style="margin-top: 1rem; margin-bottom: 0.5rem;">Park area distribution by type</h4>
+        <p>
+            The box shows the middle 50% of park areas, with a line at the median.
+            The whiskers extend to observations within 1.5 times the interquartile range; 
+            points beyond them are outliers. The chart uses a logarithmic area scale.
+        </p>
+
+        <div id="parkTypeBoxContainer" aria-hidden="true" style="margin-bottom: 1rem;">
+            <canvas id="parkTypeBoxChart"></canvas>
+        </div>
+
+        <div id="parkTypeBoxTable"></div>
+
+        <div id="parkTypeTable"></div>
+        </section>
     <p id="chartStatus" role="status"></p>
     </section>
 </main>

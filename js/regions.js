@@ -2,6 +2,8 @@ const regionSelect = document.getElementById("regionSelect");
 const regionStatus = document.getElementById("regionStatus");
 const regionResults = document.getElementById("regionResults");
 
+let currentRegionName = ""; // Global to share with charts.js
+
 async function loadRegions() {
   try {
     const response = await fetch("regions.json");
@@ -232,6 +234,7 @@ function deduplicateParks(parks) {
 }
 
 let latestSelection = 0;
+let currentRegionParks = [];
 
 regionSelect.addEventListener("change", async () => {
   const selection = ++latestSelection;
@@ -246,6 +249,7 @@ regionSelect.addEventListener("change", async () => {
   }
 
   const regionName = regionSelect.selectedOptions[0].textContent;
+  currentRegionName = regionName;
   regionStatus.textContent = `Loading ${regionName}...`;
 
   try {
@@ -277,6 +281,7 @@ regionSelect.addEventListener("change", async () => {
       authorityName: `${regionName} — region total`,
       stats: summariseParks(deduplicateParks(regionParks)),
     });
+    currentRegionParks = regionParks;
     showAuthorityStats(rows, regionName);
     // The first row is the regional total, not an authority.
     prepareCharts(rows.slice(1));
@@ -289,5 +294,105 @@ regionSelect.addEventListener("change", async () => {
       "Could not load all park data. See the browser console for details.";
   }
 });
+
+// Type grouping configuration - NOT USED; keeping for reference
+const typeGroupingMap = {
+  "park": "Public Parks",
+  "public park or garden": "Public Parks",
+  "garden": "Gardens",
+  "dog park": "Specialist Parks",
+  "recreation ground": "Recreation Grounds",
+  "village green": "Village Greens",
+  "meadow": "Meadows",
+  "wood": "Woodlands",
+  "heath": "Heathlands",
+  "cemetery": "Cemeteries",
+};
+
+function normalizeType(typeStr) {
+  if (!typeStr || typeStr.trim() === "null" || typeStr.trim() === "") {
+    return null;
+  }
+  
+  // Clean formatting: replace underscores with spaces, capitalize words
+  return typeStr
+    .trim()
+    .split("_")
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(" ");
+}
+
+function typeSummary(parks) {
+  const byType = new Map();
+  
+  for (const park of parks) {
+    const typeOS = normalizeType(park.typeOS);
+    const typeOSM = normalizeType(park.typeOSM);
+    
+    // Prefer Type (OS), then use Type (OSM), or skip if neither exists
+    const type = typeOS || typeOSM;
+    
+    if (!type) continue;
+    
+    if (!byType.has(type)) {
+      byType.set(type, { count: 0, totalAreaM2: 0, parks: [] });
+    }
+    
+    const entry = byType.get(type);
+    entry.count++;
+    if (park.areaM2 !== null) {
+      entry.totalAreaM2 += park.areaM2;
+    }
+    entry.parks.push(park);
+  }
+  
+  // Convert to array and sort by count descending
+  return Array.from(byType.entries())
+    .map(([type, data]) => ({
+      type,
+      ...data,
+      meanAreaM2: data.count > 0 ? data.totalAreaM2 / data.parks.filter(p => p.areaM2 !== null).length : null,
+    }))
+    .sort((a, b) => b.count - a.count);
+}
+
+function showParkTypeTable(typeSummaryData, regionName) {
+  const table = document.createElement("table");
+  
+  const caption = table.createCaption();
+  caption.textContent = `Park type breakdown for ${regionName}`;
+  
+  const header = table.createTHead().insertRow();
+  
+  for (const label of [
+    "Park type",
+    "Number of parks",
+    "Total area",
+    "Mean area per park",
+  ]) {
+    const th = document.createElement("th");
+    th.scope = "col";
+    th.textContent = label;
+    header.appendChild(th);
+  }
+  
+  const body = table.createTBody();
+  
+  for (const { type, count, totalAreaM2, meanAreaM2 } of typeSummaryData) {
+    const row = body.insertRow();
+    
+    const typeHeader = document.createElement("th");
+    typeHeader.scope = "row";
+    typeHeader.textContent = type || "(Unknown)";
+    row.appendChild(typeHeader);
+    
+    row.insertCell().textContent = count;
+    row.insertCell().textContent = formatArea(totalAreaM2);
+    row.insertCell().textContent = formatArea(meanAreaM2);
+  }
+  
+  const typeTableContainer = document.getElementById("parkTypeTable");
+  typeTableContainer.replaceChildren(table);
+}
 
 loadRegions();
