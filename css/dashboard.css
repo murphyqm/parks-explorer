@@ -7,6 +7,20 @@ h1 {
   margin-bottom: 0.5rem !important;
 }
 
+h2 {
+  font-family: "MrDodo", serif !important;
+  color: #572b70 !important;
+  margin-top: 1rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+h3 {
+  font-family: "MrDodo", serif !important;
+  color: #572b70 !important;
+  margin-top: 1rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
 
 /* Mobile Notice Banner */
 .mobile-notice {
